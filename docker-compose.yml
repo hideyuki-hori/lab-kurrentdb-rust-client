@@ -4,7 +4,7 @@ services:
     container_name: kurrentdb
     ports:
       - "2113:2113"
-    command: --insecure --run-projections=All
+    command: --insecure --run-projections=All --start-standard-projections=true
     volumes:
       - kurrentdb-data:/var/lib/kurrentdb
 
