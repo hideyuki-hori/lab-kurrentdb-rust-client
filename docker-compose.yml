@@ -1,0 +1,12 @@
+services:
+  kurrentdb:
+    image: kurrentplatform/kurrentdb:latest
+    container_name: kurrentdb
+    ports:
+      - "2113:2113"
+    command: --insecure --run-projections=All
+    volumes:
+      - kurrentdb-data:/var/lib/kurrentdb
+
+volumes:
+  kurrentdb-data:
