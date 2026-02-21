@@ -36,7 +36,7 @@ cargo r watch alice
 
 ## Posts
 
-- [データ管理がわからないのでRust × KurrentDBでEventSourcingをやってみた](https://zenn.dev/hideyuki_hori/articles/c11c64d9315e19) (Japanese)
+- [Rust × KurrentDBでEventSourcingをやってみた](https://zenn.dev/hideyuki_hori/articles/c11c64d9315e19) (Japanese)
 
 ## License
 
