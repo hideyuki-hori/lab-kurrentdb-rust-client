@@ -1,45 +1,37 @@
-use kurrentdb::{Client, ReadStreamOptions};
+use kurrentdb::{Client, GetStateProjectionOptions, ProjectionClient};
 
-use crate::domain::{self, AccountEvent, AccountState};
-use super::format_amount;
+use crate::domain;
+use crate::projections::{BalanceState, BALANCE_NAME};
+use super::format_amount_f64;
 
 pub async fn run(
-  client: &Client,
-  account: &str,
+    client: &Client,
+    account: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
-  let stream = domain::stream_name(account);
-  let options = ReadStreamOptions::default();
-  let mut read = client.read_stream(stream, &options).await?;
+    let proj_client = ProjectionClient::from(client.clone());
+    let stream = domain::stream_name(account);
+    let options = GetStateProjectionOptions::default().partition(stream);
 
-  let mut state = AccountState::default();
+    let state: BalanceState = proj_client
+        .get_state::<_, BalanceState>(BALANCE_NAME, &options)
+        .await??;
 
-  while let Some(event) = read.next().await? {
-    let recorded = event.get_original_event();
-    let account_event = recorded.as_json::<AccountEvent>()?;
-    state = state.apply(&account_event, recorded.revision);
-  }
+    if state.event_count == 0.0 {
+        println!("No events found.");
+        return Ok(());
+    }
 
-  if state.event_count == 0 {
-    println!("No events found.");
-    return Ok(());
-  }
+    let balance_str = format_amount_f64(state.balance);
 
-  let balance_str = if state.balance < 0 {
-    format!("-{}", format_amount(state.balance.unsigned_abs()))
-  } else {
-    format_amount(state.balance.unsigned_abs())
-  };
+    println!(
+        "{}: {} ({} events)",
+        account,
+        balance_str,
+        state.event_count as u64,
+    );
 
-  println!(
-    "{}: {} ({} events, rev: {})",
-    account,
-    balance_str,
-    state.event_count,
-    state.revision,
-  );
+    println!("  income:  {:>9}", format_amount_f64(state.total_income));
+    println!("  expense: {:>9}", format_amount_f64(state.total_expense));
 
-  println!("  income:  {:>9}", format_amount(state.total_income));
-  println!("  expense: {:>9}", format_amount(state.total_expense));
-
-  Ok(())
+    Ok(())
 }

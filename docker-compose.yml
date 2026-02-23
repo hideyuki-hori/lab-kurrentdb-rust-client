@@ -1,12 +1,15 @@
 services:
   kurrentdb:
-    image: kurrentplatform/kurrentdb:latest
+    image: eventstore/eventstore:23.10.2-alpha-arm64v8
     container_name: kurrentdb
     ports:
       - "2113:2113"
-    command: --insecure --run-projections=All
+    environment:
+      - EVENTSTORE_INSECURE=true
+      - EVENTSTORE_RUN_PROJECTIONS=All
+      - EVENTSTORE_START_STANDARD_PROJECTIONS=true
     volumes:
-      - kurrentdb-data:/var/lib/kurrentdb
+      - kurrentdb-data:/var/lib/eventstore
 
 volumes:
   kurrentdb-data:
