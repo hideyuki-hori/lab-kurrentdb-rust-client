@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS category_expenses (
+    category TEXT PRIMARY KEY,
+    total BIGINT NOT NULL DEFAULT 0,
+    count BIGINT NOT NULL DEFAULT 0
+)

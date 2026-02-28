@@ -8,5 +8,18 @@ services:
     volumes:
       - kurrentdb-data:/var/lib/kurrentdb
 
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ledger
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
 volumes:
   kurrentdb-data:
+  postgres-data:
