@@ -11,7 +11,7 @@ Each branch represents a stage in the architecture:
 | Branch | Stage | Description |
 |--------|-------|-------------|
 | `main` | **CQRS + PostgreSQL** | Catch-up Subscription projects events into PostgreSQL. Read side uses SQL queries. Value Objects, Vertical Slice Architecture. |
-| `projections/kurrentdb` | **Server-side Projection** | KurrentDB's built-in V8 engine runs JavaScript projections. Balance, category stats, budget alerts via `get_state` and `emit()`. |
+| `projections/kurrentdb` | **Server-side Projection** | Projections written in TypeScript, compiled to ES5, embedded in Rust via `include_str!()`. Balance, category stats, budget alerts via `get_state` and `emit()`. |
 | `projections/postgres` | **PostgreSQL Projection** | Same as `main`. Kept for branch history. |
 | `verify/projection-query` | **Projection verification** | Confirms KurrentDB projections only accept JavaScript (not TypeScript or other languages). |
 
@@ -20,8 +20,8 @@ Stage 1 (main~)          Stage 2                     Stage 3 (main)
 ─────────────────    ─────────────────────    ──────────────────────────
 KurrentDB              KurrentDB                  KurrentDB
   │                      │                          │
-  │ read_stream          │ JS Projection             │ Catch-up Subscription
-  │ (full replay)        │ (get_state)               │
+  │ read_stream          │ TS → ES5 Projection       │ Catch-up Subscription
+  │ (full replay)        │ (get_state / emit)        │
   ▼                      ▼                          ▼
 CLI output             CLI output                PostgreSQL
                                                    │
